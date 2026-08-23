@@ -5,6 +5,7 @@ public class movement1 : MonoBehaviour
 {
     [SerializeField] private InputActionReference move;
     [SerializeField] private InputActionReference jump;
+    [SerializeField] private InputActionReference interact;
    
     public float speed = 5f;
     public float jumpForce = 10f;
@@ -24,11 +25,16 @@ public class movement1 : MonoBehaviour
     private int jumps = 0;
     private Vector3 cameraVelocity = Vector3.zero;
 
+    private bool nearcar;
+    private bool incar;
+    private Car car;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         move.action.Enable();
         jump.action.Enable();
+        interact.action.Enable();
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -42,34 +48,54 @@ public class movement1 : MonoBehaviour
         {
             jumpPressed = true;
         }
+        if (interact.action.WasPressedThisFrame())
+        {
+            if (nearcar && !incar)
+            {
+                incar = true;
+                car.gameObject.transform.rotation = gameObject.transform.rotation;
+            }
+            else if (nearcar)
+            {
+                incar = false;
+                nearcar = false;
+            }
+        }
 
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
         rotY += mouseDelta.x * mouseSensitivity * 0.1f;
         rotX -= mouseDelta.y * mouseSensitivity * 0.1f;
         rotX = Mathf.Clamp(rotX, clampAngleMin, clampAngleMax); ;
+        if (incar)
+        {
+            car.rotY = rotY;
+        }
     }
 
     private void FixedUpdate()
     {
-        Vector3 forward = Quaternion.Euler(0f, rotY, 0f) * Vector3.forward;
-        Vector3 right = Quaternion.Euler(0f, rotY, 0f) * Vector3.right;
-
-        Vector3 moveDir = (forward * input.y + right * input.x) * speed;
-        moveDir.y = rb.linearVelocity.y;
-        rb.linearVelocity = moveDir;
-
-        rb.MoveRotation(Quaternion.Euler(0f, rotY, 0f));
-
-        if (jumpPressed)
+        if (!incar)
         {
-            if (jumps < 2)
+            Vector3 forward = Quaternion.Euler(0f, rotY, 0f) * Vector3.forward;
+            Vector3 right = Quaternion.Euler(0f, rotY, 0f) * Vector3.right;
+
+            Vector3 moveDir = (forward * input.y + right * input.x) * speed;
+            moveDir.y = rb.linearVelocity.y;
+            rb.linearVelocity = moveDir;
+
+            rb.MoveRotation(Quaternion.Euler(0f, rotY, 0f));
+
+            if (jumpPressed)
             {
-                rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-                jumps++;
+                if (jumps < 2)
+                {
+                    rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+                    rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                    jumps++;
+                }
+                jumpPressed = false;
             }
-            jumpPressed = false;
         }
     }
 
@@ -87,6 +113,14 @@ public class movement1 : MonoBehaviour
         if (collision.collider.CompareTag("Ground"))
         {
             jumps = 0;
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Car"))
+        {
+            nearcar = true;
+            car = other.GetComponent<Car>();
         }
     }
 }
