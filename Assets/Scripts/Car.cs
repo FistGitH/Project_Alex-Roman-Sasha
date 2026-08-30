@@ -1,8 +1,11 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Car : MonoBehaviour
 {
+    public Action onbreakrules;
+
     [SerializeField] private InputActionReference move;
     [SerializeField] private InputActionReference interact;
     private Rigidbody rb;
@@ -67,5 +70,17 @@ public class Car : MonoBehaviour
             nearplayer = true;
             player = collision.gameObject;
         }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.tag == "road")
+        {
+            breakroadrules();
+        }
+    }
+
+    public void breakroadrules()
+    {
+        onbreakrules.Invoke();
     }
 }

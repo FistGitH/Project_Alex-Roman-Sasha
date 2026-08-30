@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2060588611565278008}
   - component: {fileID: 3510042361110226041}
+  - component: {fileID: 3726310984310119575}
   m_Layer: 0
   m_Name: traficlight
   m_TagString: Untagged
@@ -63,6 +64,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.18933392, y: 1.1352572, z: 1.9874709}
   m_Center: {x: 0.09659243, y: -0.41047525, z: 0.021343589}
+--- !u!114 &3726310984310119575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67925461826858080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69fcf544ebae20f4097dd2e1c6fec580, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::traficlight
+  rlight: {fileID: 3989294548754857643}
+  ylight: {fileID: 6691530773836662960}
+  glight: {fileID: 8422183333808695007}
+  time: 0
 --- !u!1 &1827663207094921271
 GameObject:
   m_ObjectHideFlags: 0

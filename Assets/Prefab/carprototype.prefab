@@ -417,7 +417,7 @@ MonoBehaviour:
   interact: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   speed: 5
   mouseSensitivity: 1
-  disposition: {x: 0, y: 1, z: 0}
+  disposition: {x: 0, y: 0.5, z: 0}
   rotY: 0
 --- !u!54 &838060632543163024
 Rigidbody:
