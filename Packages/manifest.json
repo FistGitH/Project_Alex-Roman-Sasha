@@ -8,7 +8,10 @@
     "com.unity.localization": "1.5.12",
     "com.unity.multiplayer.center": "1.0.1",
     "com.unity.postprocessing": "3.5.4",
+<<<<<<< Updated upstream
     "com.unity.probuilder": "6.0.9",
+=======
+>>>>>>> Stashed changes
     "com.unity.render-pipelines.universal": "17.4.0",
     "com.unity.test-framework": "1.6.0",
     "com.unity.timeline": "1.8.12",
