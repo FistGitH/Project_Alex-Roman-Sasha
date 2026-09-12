@@ -8,7 +8,7 @@
 /[Uu]ser[Ss]ettings/
 /[Mm]emoryCaptures/
 
-# Visual Studio / Rider / VS Code generated files
+# Visual Studio / Rider / VS Code generated files 
 .vs/
 .vscode/
 .idea/
@@ -50,3 +50,8 @@ desktop.ini
 
 # Do NOT ignore .meta files
 !*.meta
+
+
+# Ignore local user/machine project settings modifications
+/ProjectSettings/ProjectVersion.txt
+/ProjectSettings/EditorSettings.asset
