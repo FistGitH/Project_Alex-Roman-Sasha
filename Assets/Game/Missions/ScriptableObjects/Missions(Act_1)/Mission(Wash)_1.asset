@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0055c47ee8cf33742a4e4bf8eb7fbde0, type: 3}
+  m_Name: Mission(Wash)_1
+  m_EditorClassIdentifier: 
+  missionID: 1
+  title: Wash your face
+  description: Go in bathroom and wash your face.
+  type: 1
+  targetID: Wash
+  requiredAmount: 1
+  nextMission: {fileID: 11400000, guid: 69c4dc18b4c871b429b2513ab97f0976, type: 2}

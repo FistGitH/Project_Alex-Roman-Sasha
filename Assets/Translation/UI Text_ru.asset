@@ -64,6 +64,10 @@ MonoBehaviour:
       \u0437\u0432\u0451\u0437\u0434."
     m_Metadata:
       m_Items: []
+  - m_Id: 3068955517227008
+    m_Localized: "\u041C\u0438\u0441\u0441\u0438\u0438"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

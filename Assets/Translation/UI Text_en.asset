@@ -59,6 +59,10 @@ MonoBehaviour:
       uncover the truth, and step into the darkness beyond the stars.
     m_Metadata:
       m_Items: []
+  - m_Id: 3068955517227008
+    m_Localized: Missions
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

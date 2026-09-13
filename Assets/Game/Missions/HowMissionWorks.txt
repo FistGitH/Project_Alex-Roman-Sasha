@@ -1,0 +1,417 @@
+How to use the mission system    (EN)
+1. Creating a mission
+
+First create a mission object:
+
+Right Click → Create → Game → Mission
+
+The mission contains:
+
+Mission ID — unique mission identifier.
+Title — mission name.
+Description — mission instructions.
+Type — mission category:
+Collect — collect items.
+Interact — interact with objects.
+Reach — reach a location.
+Kill — defeat enemies.
+Custom — custom actions.
+Target ID — object/action required for the mission.
+Required Amount — how many times the action must be completed.
+Next Mission — mission that starts after completion.
+
+Example:
+
+Title:
+Collect Crystals
+
+Description:
+Find 5 crystals
+
+Type:
+Collect
+
+Target ID:
+Crystal
+
+Required Amount:
+5
+2. Starting a mission
+
+In Unity, select:
+
+MissionManager
+
+Assign your mission:
+
+First Mission
+        ↓
+Collect Crystals
+
+When the game starts, this mission becomes active.
+
+3. Completing mission objectives
+
+Game objects send progress to the mission system.
+
+Example:
+
+Player collects a crystal:
+
+MissionManager.Instance.AddProgress("Crystal");
+
+Progress:
+
+0/5
+1/5
+2/5
+3/5
+4/5
+5/5
+
+When the required amount is reached:
+
+Mission Completed
+
+The mission finishes automatically.
+
+4. Instant mission completion
+
+For actions like:
+
+opening a door;
+talking to an NPC;
+pressing a button.
+
+Use:
+
+MissionManager.Instance.CompleteMission();
+
+The mission will complete immediately.
+
+5. Mission chain
+
+Use the Next Mission field:
+
+Mission 1:
+Find the key
+        |
+        ↓
+Mission 2:
+Open the door
+        |
+        ↓
+Mission 3:
+Escape the room
+
+After completing a mission, the next mission starts automatically.
+
+
+Using missions in code
+
+The main commands are:
+
+Add progress:
+MissionManager.Instance.AddProgress("TargetID");
+
+Example:
+
+MissionManager.Instance.AddProgress("Crystal");
+
+Adds +1 progress.
+
+Add multiple progress:
+MissionManager.Instance.AddProgress("Crystal", 5);
+
+Adds +5.
+
+Complete mission instantly:
+MissionManager.Instance.CompleteMission();
+
+Used for:
+
+opening doors;
+talking to NPCs;
+pressing buttons.
+Check current mission:
+if(MissionManager.Instance.CheckTarget("Crystal"))
+{
+    Debug.Log("This action belongs to current mission");
+}
+
+
+=------------------------------------------------------------------------=
+
+
+
+Как использовать систему миссий   (RU)
+Создание миссии
+
+Сначала создай объект миссии:
+
+Right Click → Create → Game → Mission
+
+У миссии есть основные параметры:
+
+Mission ID — уникальный номер миссии.
+Title — название миссии.
+Description — описание задания.
+Type — тип миссии:
+Collect — собрать предметы.
+Interact — взаимодействовать с объектом.
+Reach — дойти до места.
+Kill — уничтожить врагов.
+Custom — своё действие.
+Target ID — объект, который должен выполнять миссию.
+Required Amount — сколько раз нужно выполнить действие.
+Next Mission — следующая миссия после завершения.
+
+Пример:
+
+Title:
+Collect Crystals
+
+Description:
+Find 5 crystals
+
+Type:
+Collect
+
+Target ID:
+Crystal
+
+Required Amount:
+5
+2. Запуск первой миссии
+
+В объекте MissionManager в Unity:
+
+MissionManager
+    ↓
+First Mission
+    ↓
+Collect Crystals
+
+Перетащи созданную миссию в поле First Mission.
+
+Теперь при запуске игры эта миссия будет активна.
+
+3. Выполнение миссии
+
+Игровые объекты должны сообщать системе, что действие выполнено.
+
+Например:
+
+Игрок взял кристалл:
+
+MissionManager.Instance.AddProgress("Crystal");
+
+Прогресс изменится:
+
+0/5
+1/5
+2/5
+3/5
+4/5
+5/5
+
+После достижения 5:
+
+Mission Completed
+
+Миссия автоматически завершится.
+
+4. Миссия с мгновенным выполнением
+
+Некоторые задания не требуют счётчика.
+
+Например:
+
+открыть дверь;
+поговорить с NPC;
+нажать кнопку.
+
+Тогда используй:
+
+MissionManager.Instance.CompleteMission();
+
+Миссия сразу станет выполненной.
+
+5. Следующая миссия
+
+В MissionData есть поле:
+
+Next Mission
+
+Например:
+
+Mission 1:
+Find the key
+        |
+        ↓
+Mission 2:
+Open the door
+        |
+        ↓
+Mission 3:
+Escape the room
+
+После завершения первой миссии система автоматически запускает следующую.
+
+
+
+
+Использование миссий в коде
+
+В любой скрипт, где происходит действие (подбор предмета, убийство врага, открытие двери), ты вызываешь MissionManager.
+
+Основная команда:
+
+MissionManager.Instance.AddProgress("ID_миссии");
+
+Она добавляет +1 к текущей миссии.
+
+1. Собрать предмет (Collect)
+
+Например, у тебя есть кристалл:
+
+MissionData:
+
+Target ID:
+Crystal
+
+Required Amount:
+5
+
+Скрипт кристалла:
+
+using UnityEngine;
+
+public class Crystal : MonoBehaviour
+{
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            MissionManager.Instance.AddProgress("Crystal");
+
+            Destroy(gameObject);
+        }
+    }
+}
+
+Теперь каждый собранный кристалл делает:
+
+0/5
+→
+1/5
+→
+2/5
+...
+5/5
+2. Убить врага (Kill)
+
+Враг умер:
+
+using UnityEngine;
+
+public class Enemy : MonoBehaviour
+{
+    public void Die()
+    {
+        MissionManager.Instance.AddProgress("Enemy");
+
+        Destroy(gameObject);
+    }
+}
+
+В MissionData:
+
+Target ID:
+Enemy
+
+Required Amount:
+10
+
+После 10 убитых врагов миссия завершится.
+
+3. Открыть дверь (Interact)
+
+Для действий без количества:
+
+using UnityEngine;
+
+public class Door : MonoBehaviour
+{
+    public void OpenDoor()
+    {
+        MissionManager.Instance.CompleteMission();
+    }
+}
+
+Когда дверь открылась:
+
+Mission Completed
+4. Дойти до точки (Reach)
+
+Создаём область:
+
+using UnityEngine;
+
+public class MissionPoint : MonoBehaviour
+{
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("Player"))
+        {
+            MissionManager.Instance.AddProgress("Location");
+        }
+    }
+}
+
+MissionData:
+
+Target ID:
+Location
+
+Required Amount:
+1
+
+Игрок пришёл → миссия выполнена.
+
+5. Добавить несколько очков сразу
+
+Например игрок нашёл 3 предмета:
+
+MissionManager.Instance.AddProgress("Crystal", 3);
+
+Результат:
+
+0/5
++
+3
+=
+3/5
+6. Проверить активную миссию
+
+Например NPC должен говорить только если активна нужная миссия:
+
+if(MissionManager.Instance.CheckTarget("TalkNPC"))
+{
+    Debug.Log("Можно поговорить");
+}
+7. Полный пример NPC
+using UnityEngine;
+
+public class NPC : MonoBehaviour
+{
+    public void Talk()
+    {
+        if(MissionManager.Instance.CheckTarget("OldMan"))
+        {
+            MissionManager.Instance.CompleteMission();
+
+            Debug.Log("NPC дал награду");
+        }
+    }
+}

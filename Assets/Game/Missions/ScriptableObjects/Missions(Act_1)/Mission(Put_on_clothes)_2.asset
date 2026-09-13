@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0055c47ee8cf33742a4e4bf8eb7fbde0, type: 3}
+  m_Name: Mission(Put_on_clothes)_2
+  m_EditorClassIdentifier: 
+  missionID: 2
+  title: Wash your face
+  description: Go and put on your clothes.
+  type: 1
+  targetID: Clothes
+  requiredAmount: 1
+  nextMission: {fileID: 11400000, guid: cbca06d5a7f5e6e48a93b075dd5ea544, type: 2}
