@@ -6,4 +6,5 @@ public class item : ScriptableObject
 {
     public string name;
     [SerializeField] public Image pic;
+    public int index;
 }
