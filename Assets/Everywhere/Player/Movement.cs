@@ -11,10 +11,8 @@ public class Movement : MonoBehaviour
 
     [Header("Player Sounds")]
     [SerializeField] private AudioSource audioSource;
-
     [SerializeField] private AudioClip[] walkSounds;
     [SerializeField] private AudioClip[] runSounds;
-
     [SerializeField] private AudioClip jumpSound;
     [SerializeField] private AudioClip tiredSound;
 
@@ -33,7 +31,6 @@ public class Movement : MonoBehaviour
     public float maxStamina = 5f;
     public float staminaDrain = 1f;
     public float staminaRecover = 1.5f;
-
     public float tiredTime = 2f;
 
     [SerializeField] private UnityEngine.UI.Slider staminaSlider;
@@ -42,7 +39,7 @@ public class Movement : MonoBehaviour
     private bool exhausted;
     private float exhaustedTimer;
 
-    // плавность движения
+    [Header("Movement Smooth")]
     public float acceleration = 12f;
     public float deceleration = 18f;
     public float airControl = 0.35f;
@@ -50,7 +47,6 @@ public class Movement : MonoBehaviour
     [Header("Low Stamina Effects")]
     public float lowStaminaPercent = 0.2f;
     public float tiredRunMultiplier = 0.5f;
-
     public float staminaUIFadeSpeed = 3f;
 
     private CanvasGroup staminaCanvas;
@@ -65,9 +61,8 @@ public class Movement : MonoBehaviour
     [SerializeField] private float ladderDownSpeed = 3f;
     [SerializeField] private float ladderForce = 30f;
 
-    private bool isOnLadder = false;
+    private bool isOnLadder;
     private ConstantForce constantForce;
-
     private Vector3 ladderNormal;
 
     [Header("Camera")]
@@ -106,35 +101,38 @@ public class Movement : MonoBehaviour
     public float landCameraOffset = 0.15f;
     public float cameraAnimSmooth = 8f;
 
-
     private Rigidbody rb;
     private CapsuleCollider capsule;
-
 
     private Vector2 input;
 
     private float rotX;
     private float rotY;
 
-
     private bool jumpPressed;
     private bool isRunning;
     private bool isCrouching;
 
-
     private int jumps;
-
 
     private float currentHeight;
     private float bobTimer;
-
     private float cameraOffsetY;
-
 
     private Vector3 currentVelocity;
 
-    private float normalGravity;
+    // ==============================
+    // CAR
+    // ==============================
 
+    private bool inCar;
+    private bool nearCar;
+
+    private Car currentCar;
+
+    // ==============================
+    // AWAKE
+    // ==============================
 
     private void Awake()
     {
@@ -143,14 +141,10 @@ public class Movement : MonoBehaviour
 
         rb.freezeRotation = true;
 
-        normalGravity = Physics.gravity.y;
-
         move.action.Enable();
         jump.action.Enable();
 
-
         currentHeight = standHeight;
-
         currentCameraHeight = standCameraHeight;
 
         stamina = maxStamina;
@@ -159,20 +153,23 @@ public class Movement : MonoBehaviour
         {
             staminaSlider.maxValue = maxStamina;
             staminaSlider.value = stamina;
-            staminaCanvas = staminaSlider.GetComponent<CanvasGroup>();
+
+            staminaCanvas =
+                staminaSlider.GetComponent<CanvasGroup>();
 
             if (staminaCanvas == null)
             {
-                staminaCanvas = staminaSlider.gameObject.AddComponent<CanvasGroup>();
+                staminaCanvas =
+                    staminaSlider.gameObject.AddComponent<CanvasGroup>();
             }
 
-            staminaCanvas.alpha = 0;
+            staminaCanvas.alpha = 0f;
         }
 
-
         if (playerCamera != null)
+        {
             playerCamera.fieldOfView = normalFOV;
-
+        }
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -184,200 +181,230 @@ public class Movement : MonoBehaviour
             constantForce.enabled = false;
         }
     }
+
+    // ==============================
+    // UPDATE
+    // ==============================
+
     private void Update()
     {
+        if (inCar)
+            return;
+
+        // E = войти в машину
+        if (Keyboard.current != null &&
+            Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            if (nearCar && currentCar != null)
+            {
+                currentCar.EnterCar(gameObject);
+                return;
+            }
+        }
+
         input = move.action.ReadValue<Vector2>();
 
-        // прыжок
+        // Прыжок
         if (jump.action.WasPressedThisFrame())
         {
             jumpPressed = true;
         }
 
+        // Мышь
+        if (Mouse.current != null)
+        {
+            Vector2 mouse =
+                Mouse.current.delta.ReadValue();
 
-        // мышь
-        Vector2 mouse = Mouse.current.delta.ReadValue();
+            rotY += mouse.x *
+                    mouseSensitivity *
+                    0.1f;
 
-        rotY += mouse.x * mouseSensitivity * 0.1f;
-        rotX -= mouse.y * mouseSensitivity * 0.1f;
+            rotX -= mouse.y *
+                    mouseSensitivity *
+                    0.1f;
 
-        rotX = Mathf.Clamp(
-            rotX,
-            minLook,
-            maxLook
-        );
+            rotX =
+                Mathf.Clamp(
+                    rotX,
+                    minLook,
+                    maxLook
+                );
+        }
 
+        if (Keyboard.current != null)
+        {
+            // Присед
+            isCrouching =
+                Keyboard.current.leftCtrlKey.isPressed;
 
-        // присед
-        isCrouching =
-            Keyboard.current.leftCtrlKey.isPressed;
-
-
-        // бег только если есть движение + зажат Shift
-        isRunning =
-          Keyboard.current.leftShiftKey.isPressed &&
-          input.sqrMagnitude > 0.01f &&
-          !isCrouching &&
-          !exhausted;
+            // Бег
+            isRunning =
+                Keyboard.current.leftShiftKey.isPressed &&
+                input.sqrMagnitude > 0.01f &&
+                !isCrouching &&
+                !exhausted;
+        }
 
         HandleStamina();
-
         HandleFootsteps();
     }
 
+    // ==============================
+    // FIXED UPDATE
+    // ==============================
+
     private void FixedUpdate()
     {
+        if (inCar)
+            return;
+
         float targetSpeed = walkSpeed;
 
-
-        // скорость на лестнице
         if (isOnLadder)
         {
-            targetSpeed = walkSpeed * 0.5f;
+            targetSpeed =
+                walkSpeed * 0.5f;
         }
 
-
-        // бег
         if (isRunning && !isOnLadder)
         {
             targetSpeed = runSpeed;
 
-
             float staminaPercent =
                 stamina / maxStamina;
 
-
-            if (staminaPercent <= lowStaminaPercent)
+            if (staminaPercent <=
+                lowStaminaPercent)
             {
-                targetSpeed *= tiredRunMultiplier;
+                targetSpeed *=
+                    tiredRunMultiplier;
             }
         }
 
-
-        // присед
-        if (isCrouching && !isOnLadder)
+        if (isCrouching &&
+            !isOnLadder)
         {
-            targetSpeed = crouchSpeed;
+            targetSpeed =
+                crouchSpeed;
         }
 
-
-
         Vector3 forward =
-            Quaternion.Euler(0, rotY, 0) *
-            Vector3.forward;
-
+            Quaternion.Euler(
+                0f,
+                rotY,
+                0f
+            ) * Vector3.forward;
 
         Vector3 right =
-            Quaternion.Euler(0, rotY, 0) *
-            Vector3.right;
-
-
+            Quaternion.Euler(
+                0f,
+                rotY,
+                0f
+            ) * Vector3.right;
 
         Vector3 targetVelocity =
-            (forward * input.y + right * input.x)
-            .normalized *
+            (
+                forward * input.y +
+                right * input.x
+            ).normalized *
             targetSpeed;
-
-
 
         float control =
             IsGrounded() || isOnLadder
-            ? 1f
-            : airControl;
-
-
+                ? 1f
+                : airControl;
 
         float smooth =
-            targetVelocity.magnitude > currentVelocity.magnitude
-            ? acceleration
-            : deceleration;
+            targetVelocity.magnitude >
+            currentVelocity.magnitude
+                ? acceleration
+                : deceleration;
 
+        currentVelocity =
+            Vector3.Lerp(
+                currentVelocity,
+                targetVelocity,
+                smooth *
+                control *
+                Time.fixedDeltaTime
+            );
 
-
-        currentVelocity = Vector3.Lerp(
-            currentVelocity,
-            targetVelocity,
-            smooth * control * Time.fixedDeltaTime
-        );
-
-
-
-        // обычное движение
-        rb.linearVelocity = new Vector3(
-            currentVelocity.x,
-            rb.linearVelocity.y,
-            currentVelocity.z
-        );
-
-
+        rb.linearVelocity =
+            new Vector3(
+                currentVelocity.x,
+                rb.linearVelocity.y,
+                currentVelocity.z
+            );
 
         rb.MoveRotation(
-            Quaternion.Euler(0, rotY, 0)
+            Quaternion.Euler(
+                0f,
+                rotY,
+                0f
+            )
         );
 
-
-
-        // движение по лестнице 45 градусов
-        if (isOnLadder && ladderDirection != null)
+        // LADDER
+        if (isOnLadder &&
+            ladderDirection != null)
         {
-            float speed = input.y > 0 ? ladderUpSpeed : ladderDownSpeed;
+            float speed =
+                input.y > 0f
+                    ? ladderUpSpeed
+                    : ladderDownSpeed;
 
-            Vector3 climbVelocity = ladderDirection.forward * (input.y * speed);
+            Vector3 climbVelocity =
+                ladderDirection.forward *
+                (input.y * speed);
 
-            rb.linearVelocity = new Vector3(
-                climbVelocity.x,
-                climbVelocity.y,
-                climbVelocity.z
-            );
+            rb.linearVelocity =
+                climbVelocity;
         }
 
-
-
-        // прыжок только не на лестнице
-        if (jumpPressed && !isOnLadder)
+        // JUMP
+        if (jumpPressed &&
+            !isOnLadder)
         {
             if (jumps < maxJumps)
             {
-                rb.linearVelocity = new Vector3(
-                    rb.linearVelocity.x,
-                    0,
-                    rb.linearVelocity.z
-                );
-
+                rb.linearVelocity =
+                    new Vector3(
+                        rb.linearVelocity.x,
+                        0f,
+                        rb.linearVelocity.z
+                    );
 
                 rb.AddForce(
                     Vector3.up * jumpForce,
                     ForceMode.Impulse
                 );
 
-
-                if (jumpSound != null)
+                if (jumpSound != null &&
+                    audioSource != null)
                 {
-                    audioSource.PlayOneShot(jumpSound);
+                    audioSource.PlayOneShot(
+                        jumpSound
+                    );
                 }
-
 
                 jumps++;
 
-                cameraOffsetY = jumpCameraOffset;
+                cameraOffsetY =
+                    jumpCameraOffset;
             }
-
 
             jumpPressed = false;
         }
 
-
-
-        // лестница
+        // LADDER GRAVITY
         if (isOnLadder)
         {
-            // убираем падение
             rb.useGravity = false;
 
-
-            // прижимаем к лестнице
             rb.AddForce(
-                -ladderNormal * ladderForce,
+                -ladderNormal *
+                ladderForce,
                 ForceMode.Force
             );
         }
@@ -386,110 +413,148 @@ public class Movement : MonoBehaviour
             rb.useGravity = true;
         }
     }
+
+    // ==============================
+    // CAMERA
+    // ==============================
+
     private void LateUpdate()
     {
+        if (inCar)
+            return;
+
         if (cameraTransform == null)
             return;
 
-
         HandleCrouch();
-
         HandleHeadBob();
-
         HandleCameraAnimation();
-
         HandleFOV();
 
-
-
         Vector3 cameraPosition =
-    transform.position +
-    Vector3.up * currentCameraHeight;
+            transform.position +
+            Vector3.up *
+            currentCameraHeight;
 
-        cameraPosition.y += cameraOffsetY;
+        cameraPosition.y +=
+            cameraOffsetY;
 
-        cameraTransform.position = cameraPosition;
-
-
+        cameraTransform.position =
+            cameraPosition;
 
         cameraTransform.rotation =
             Quaternion.Euler(
                 rotX,
                 rotY,
-                0
+                0f
             );
     }
 
+    // ==============================
+    // CAR
+    // ==============================
+
+    public void SetInCar(bool value)
+    {
+        inCar = value;
+
+        input = Vector2.zero;
+        currentVelocity = Vector3.zero;
+
+        jumpPressed = false;
+        isRunning = false;
+        isCrouching = false;
+
+        if (rb != null)
+        {
+            rb.linearVelocity =
+                Vector3.zero;
+
+            rb.angularVelocity =
+                Vector3.zero;
+        }
+
+        // Выключаем обычную камеру игрока
+        if (playerCamera != null)
+        {
+            playerCamera.gameObject
+                .SetActive(!value);
+        }
+        else if (cameraTransform != null)
+        {
+            cameraTransform.gameObject
+                .SetActive(!value);
+        }
+    }
+
+    // ==============================
+    // FOV
+    // ==============================
 
     private void HandleFOV()
     {
         if (playerCamera == null)
             return;
 
-
         float targetFOV =
             isRunning
-            ? runFOV
-            : normalFOV;
-
-
+                ? runFOV
+                : normalFOV;
 
         playerCamera.fieldOfView =
             Mathf.Lerp(
                 playerCamera.fieldOfView,
                 targetFOV,
-                Time.deltaTime * fovSmooth
+                Time.deltaTime *
+                fovSmooth
             );
     }
+
+    // ==============================
+    // HEAD BOB
+    // ==============================
 
     private void HandleHeadBob()
     {
         Vector3 horizontalVelocity =
             rb.linearVelocity;
 
+        horizontalVelocity.y = 0f;
 
-        horizontalVelocity.y = 0;
-
-
-
-        if (horizontalVelocity.magnitude > 0.2f)
+        if (horizontalVelocity.magnitude >
+            0.2f)
         {
             float speedMultiplier = 1f;
-
 
             if (isRunning)
             {
                 speedMultiplier = 1.5f;
 
-
                 float staminaPercent =
                     stamina / maxStamina;
 
-
-                if (staminaPercent <= lowStaminaPercent)
+                if (staminaPercent <=
+                    lowStaminaPercent)
                 {
-                    speedMultiplier = 2.5f;
+                    speedMultiplier =
+                        2.5f;
                 }
             }
-
 
             bobTimer +=
                 Time.deltaTime *
                 bobSpeed *
                 speedMultiplier;
 
-
             float bob =
-                Mathf.Sin(bobTimer)
-                *
+                Mathf.Sin(bobTimer) *
                 bobAmount;
-
 
             cameraTransform.localPosition =
                 new Vector3(
-                    0,
+                    0f,
                     bob,
-                    0
+                    0f
                 );
         }
         else
@@ -498,71 +563,82 @@ public class Movement : MonoBehaviour
                 Vector3.Lerp(
                     cameraTransform.localPosition,
                     Vector3.zero,
-                    Time.deltaTime * 8f
+                    Time.deltaTime *
+                    8f
                 );
 
-
-            bobTimer = 0;
+            bobTimer = 0f;
         }
     }
+
+    // ==============================
+    // CAMERA ANIMATION
+    // ==============================
 
     private void HandleCameraAnimation()
     {
         cameraOffsetY =
             Mathf.Lerp(
                 cameraOffsetY,
-                0,
+                0f,
                 Time.deltaTime *
                 cameraAnimSmooth
             );
     }
+
+    // ==============================
+    // CROUCH
+    // ==============================
+
     private void HandleCrouch()
     {
-        bool canStand = CheckCanStand();
-
+        bool canStand =
+            CheckCanStand();
 
         float targetHeight;
 
-
-        if (isCrouching || !canStand)
+        if (isCrouching ||
+            !canStand)
         {
-            targetHeight = crouchHeight;
+            targetHeight =
+                crouchHeight;
         }
         else
         {
-            targetHeight = standHeight;
+            targetHeight =
+                standHeight;
         }
 
+        currentHeight =
+            Mathf.Lerp(
+                currentHeight,
+                targetHeight,
+                Time.deltaTime *
+                crouchSmooth
+            );
 
-
-        currentHeight = Mathf.Lerp(
-            currentHeight,
-            targetHeight,
-            Time.deltaTime * crouchSmooth
-        );
-
-
-
-        capsule.height = currentHeight;
-
+        capsule.height =
+            currentHeight;
 
         capsule.center =
-        new Vector3(
-        0,
-        currentHeight / 2f,
-        0
-        );
+            new Vector3(
+                0f,
+                currentHeight / 2f,
+                0f
+            );
 
-        float targetCameraHeight = isCrouching
-            ? crouchCameraHeight
-            : standCameraHeight;
+        float targetCameraHeight =
+            isCrouching
+                ? crouchCameraHeight
+                : standCameraHeight;
 
-
-        currentCameraHeight = Mathf.Lerp(
-            currentCameraHeight,
-            targetCameraHeight,
-            Time.deltaTime * cameraCrouchSmooth
-        );
+        currentCameraHeight =
+            Mathf.Lerp(
+                currentCameraHeight,
+                targetCameraHeight,
+                Time.deltaTime *
+                cameraCrouchSmooth
+            );
     }
 
     private bool CheckCanStand()
@@ -570,17 +646,14 @@ public class Movement : MonoBehaviour
         float radius =
             capsule.radius * 0.9f;
 
-
         float distance =
-            standHeight - radius * 2;
-
-
+            standHeight -
+            radius * 2f;
 
         Vector3 start =
             transform.position +
-            Vector3.up * radius;
-
-
+            Vector3.up *
+            radius;
 
         return !Physics.SphereCast(
             start,
@@ -591,50 +664,66 @@ public class Movement : MonoBehaviour
         );
     }
 
+    // ==============================
+    // GROUND
+    // ==============================
+
     private bool IsGrounded()
     {
         return Physics.Raycast(
             transform.position,
             Vector3.down,
-            currentHeight / 2f + 0.15f
+            currentHeight / 2f +
+            0.15f
         );
     }
+
+    // ==============================
+    // STAMINA
+    // ==============================
 
     private void HandleStamina()
     {
         bool runningNow =
             isRunning &&
-            input.sqrMagnitude > 0.01f;
-
+            input.sqrMagnitude >
+            0.01f;
 
         if (runningNow)
         {
-            stamina -= staminaDrain * Time.deltaTime;
+            stamina -=
+                staminaDrain *
+                Time.deltaTime;
 
             if (staminaSlider != null)
-                ShowStaminaUI();
-
-
-            if (stamina <= 0)
             {
-                stamina = 0;
+                ShowStaminaUI();
+            }
+
+            if (stamina <= 0f)
+            {
+                stamina = 0f;
+
                 exhausted = true;
+                exhaustedTimer =
+                    tiredTime;
 
-                exhaustedTimer = tiredTime;
-
-
-                if (tiredSound != null)
+                if (tiredSound != null &&
+                    audioSource != null)
                 {
-                    audioSource.PlayOneShot(tiredSound);
+                    audioSource.PlayOneShot(
+                        tiredSound
+                    );
                 }
-
-
 
                 if (staminaSlider != null)
                 {
-                    staminaSlider.fillRect
-                        .GetComponent<UnityEngine.UI.Image>()
-                        .color = Color.red;
+                    staminaSlider
+                        .fillRect
+                        .GetComponent<
+                            UnityEngine.UI.Image>()
+                        .color =
+                        Color.red;
                 }
             }
         }
@@ -642,40 +731,44 @@ public class Movement : MonoBehaviour
         {
             if (!exhausted)
             {
-                stamina += staminaRecover * Time.deltaTime;
+                stamina +=
+                    staminaRecover *
+                    Time.deltaTime;
             }
         }
 
-
-
         if (exhausted)
         {
-            exhaustedTimer -= Time.deltaTime;
+            exhaustedTimer -=
+                Time.deltaTime;
 
-            if (exhaustedTimer <= 0)
+            if (exhaustedTimer <= 0f)
             {
                 exhausted = false;
 
                 if (staminaSlider != null)
                 {
-                    staminaSlider.fillRect
-                        .GetComponent<UnityEngine.UI.Image>()
-                        .color = Color.white;
+                    staminaSlider
+                        .fillRect
+                        .GetComponent<
+                            UnityEngine.UI.Image>()
+                        .color =
+                        Color.white;
                 }
             }
         }
 
-
-        stamina = Mathf.Clamp(
-            stamina,
-            0,
-            maxStamina
-        );
-
+        stamina =
+            Mathf.Clamp(
+                stamina,
+                0f,
+                maxStamina
+            );
 
         if (staminaSlider != null)
         {
-            staminaSlider.value = stamina;
+            staminaSlider.value =
+                stamina;
         }
 
         if (stamina >= maxStamina)
@@ -693,15 +786,15 @@ public class Movement : MonoBehaviour
         if (staminaCanvas == null)
             return;
 
-
-        staminaSlider.gameObject.SetActive(true);
-
+        staminaSlider.gameObject
+            .SetActive(true);
 
         staminaCanvas.alpha =
             Mathf.Lerp(
                 staminaCanvas.alpha,
                 1f,
-                Time.deltaTime * staminaUIFadeSpeed
+                Time.deltaTime *
+                staminaUIFadeSpeed
             );
     }
 
@@ -710,59 +803,58 @@ public class Movement : MonoBehaviour
         if (staminaCanvas == null)
             return;
 
-
         staminaCanvas.alpha =
             Mathf.Lerp(
                 staminaCanvas.alpha,
                 0f,
-                Time.deltaTime * staminaUIFadeSpeed
+                Time.deltaTime *
+                staminaUIFadeSpeed
             );
 
-
-        if (staminaCanvas.alpha <= 0.01f)
+        if (staminaCanvas.alpha <=
+            0.01f)
         {
-            staminaSlider.gameObject.SetActive(false);
+            staminaSlider.gameObject
+                .SetActive(false);
         }
     }
 
+    // ==============================
+    // FOOTSTEPS
+    // ==============================
+
     private void HandleFootsteps()
     {
-        Vector3 horizontalVelocity = rb.linearVelocity;
-        horizontalVelocity.y = 0;
+        Vector3 horizontalVelocity =
+            rb.linearVelocity;
 
+        horizontalVelocity.y = 0f;
 
         bool moving =
-            horizontalVelocity.magnitude > 0.5f &&
+            horizontalVelocity.magnitude >
+            0.5f &&
             IsGrounded();
 
-
         if (!moving)
-        {
             return;
-        }
-
 
         stepTimer -= Time.deltaTime;
 
+        float delay =
+            isRunning
+                ? runStepDelay
+                : walkStepDelay;
 
-        float delay;
-
-        if (isRunning)
-        {
-            delay = 1.2f;
-        }
-        else
-        {
-            delay = 1f;
-        }
-
-
-        if (stepTimer <= 0)
+        if (stepTimer <= 0f)
         {
             PlayStepSound();
 
-            // небольшой случайный разброс
-            stepTimer = delay + Random.Range(-0.15f, 0.15f);
+            stepTimer =
+                delay +
+                Random.Range(
+                    -0.15f,
+                    0.15f
+                );
         }
     }
 
@@ -771,72 +863,116 @@ public class Movement : MonoBehaviour
         if (audioSource == null)
             return;
 
-
         AudioClip[] clips =
             isRunning
-            ? runSounds
-            : walkSounds;
+                ? runSounds
+                : walkSounds;
 
-
-        if (clips.Length == 0)
+        if (clips == null ||
+            clips.Length == 0)
             return;
 
-
         int random =
-            Random.Range(0, clips.Length);
-
+            Random.Range(
+                0,
+                clips.Length
+            );
 
         audioSource.PlayOneShot(
             clips[random]
         );
     }
 
+    // ==============================
+    // COLLISIONS
+    // ==============================
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(
+        Collision collision)
     {
-        if (collision.collider.CompareTag("Ground"))
+        if (collision.collider
+            .CompareTag("Ground"))
         {
             jumps = 0;
-            cameraOffsetY = landCameraOffset;
-        }
 
-        
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if (collision.collider.CompareTag("Ground"))
-        {
-            jumps = 0;
+            cameraOffsetY =
+                landCameraOffset;
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionStay(
+        Collision collision)
     {
+        if (collision.collider
+            .CompareTag("Ground"))
+        {
+            jumps = 0;
+        }
+    }
+
+    // ==============================
+    // TRIGGERS
+    // ==============================
+
+    private void OnTriggerEnter(
+        Collider other)
+    {
+        // LADDER
         if (other.CompareTag("Ladder"))
         {
             isOnLadder = true;
 
-            // включаем прижим к лестнице
+            ladderNormal =
+                -other.transform.forward;
+
             if (constantForce != null)
             {
-                constantForce.enabled = true;
+                constantForce.enabled =
+                    true;
+            }
+        }
+
+        // CAR
+        if (other.CompareTag("Car"))
+        {
+            Car foundCar =
+                other.GetComponentInParent<Car>();
+
+            if (foundCar != null)
+            {
+                nearCar = true;
+                currentCar = foundCar;
             }
         }
     }
-    private void OnTriggerExit(Collider other)
+
+    private void OnTriggerExit(
+        Collider other)
     {
+        // LADDER
         if (other.CompareTag("Ladder"))
         {
             isOnLadder = false;
 
-            // выключаем прижим
             if (constantForce != null)
             {
-                constantForce.enabled = false;
+                constantForce.enabled =
+                    false;
+            }
+        }
+
+        // CAR
+        if (other.CompareTag("Car"))
+        {
+            Car foundCar =
+                other.GetComponentInParent<Car>();
+
+            if (foundCar ==
+                currentCar)
+            {
+                nearCar = false;
+                currentCar = null;
             }
         }
     }
-
-
 }
