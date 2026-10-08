@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e912ae30d12336b4b93a4ac205023b7c
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 396850
+  packageName: Water Surface & Underwater System (Built-in RP
+  packageVersion: 2.0
+  assetPath: Assets/Environment/OriginalWater/Shaders/CausticsProjector.shader
+  uploadId: 1001482

@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.abstractocclusion.webgpuwater": {
+      "version": "file:com.abstractocclusion.webgpuwater",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.render-pipelines.universal": "17.0.0",
+        "com.unity.inputsystem": "1.18.0"
+      }
+    },
     "com.unity.addressables": {
       "version": "2.6.0",
       "depth": 1,
@@ -79,8 +88,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.14.0",
-      "depth": 0,
+      "version": "1.18.0",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.uielements": "1.0.0"
