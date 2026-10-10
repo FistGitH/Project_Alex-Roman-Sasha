@@ -7,6 +7,8 @@ public class OpenDoor : MonoBehaviour
 {
     private Animator animator;
 
+    public bool IsOpen => animator != null && animator.GetBool("EnterTrigger");
+
     [Header("Door")]
     [SerializeField] private bool Needkey;
     [SerializeField] private bool Getkey;

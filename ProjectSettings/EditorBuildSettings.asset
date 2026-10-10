@@ -8,6 +8,24 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Lobby/Lobby_Scene.unity
     guid: 3e5a6b5d19342a74399ca390a52d3c91
+  - enabled: 1
+    path: Assets/Game/1_Act(The-land)/Scenes/TheLand_Scene.unity
+    guid: d3b24046bbc3f9e47a2d3098cc8b315c
+  - enabled: 1
+    path: Assets/Game/1_Act(The-land)/Scenes/RideToWork.unity
+    guid: 68fe5c71da5aa6f44b8230fc50014672
+  - enabled: 1
+    path: Assets/Game/2_Act(The-ocean)/Scenes/Pier_Scene.unity
+    guid: 0c8952facd98bf9489e878cb68ae2330
+  - enabled: 1
+    path: Assets/Game/2_Act(The-ocean)/Scenes/SeaDiving_Scene.unity
+    guid: 5d62234051f161543b4270a29f197514
+  - enabled: 1
+    path: Assets/Game/2_Act(The-ocean)/Scenes/UnderWaterBase_Scene.unity
+    guid: 83850c4b682c4ca478a86c53519b770a
+  - enabled: 1
+    path: Assets/Game/2_Act(The-ocean)/Scenes/RocketLaunching_Scene.unity
+    guid: 0ca97ab9f384d8148a9258614b49bb52
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 2a66b8ab0cbf0e9438d745d7dda83e86, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

@@ -32847,6 +32847,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4722820644116141313, guid: 2830c8e32abb4404a9610759586506cb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1597703855}
+    - targetCorrespondingSourceObject: {fileID: 4722820644116141313, guid: 2830c8e32abb4404a9610759586506cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1597703856}
   m_SourcePrefab: {fileID: 100100000, guid: 2830c8e32abb4404a9610759586506cb, type: 3}
 --- !u!4 &1597703852 stripped
 Transform:
@@ -32888,6 +32891,22 @@ MonoBehaviour:
   progressPanel: {fileID: 394918367}
   progressSlider: {fileID: 1893260950}
   hideUIDelay: 3
+--- !u!114 &1597703856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177300293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48ab8882aa52274449f7df8d9ba0cabb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneName: RideToWork
+  openingDelay: 1
+  fadeOutDuration: 1
+  fadeInDuration: 1
 --- !u!1 &1608698892 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 535845361207076354, guid: 2a8bbefd587f3ae448b17021f0fcda8c, type: 3}
