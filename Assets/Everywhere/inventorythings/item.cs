@@ -1,11 +1,10 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "item", menuName = "Game/item")]
 public class item : ScriptableObject
 {
     public string name;
-    [SerializeField] public Image pic;
+    [SerializeField] public Sprite pic;
     public int index;
     public int amount;
 }
