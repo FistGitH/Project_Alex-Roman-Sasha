@@ -1,10 +1,8 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "item", menuName = "Game/item")]
-public class item : ScriptableObject
+public class item : MonoBehaviour
 {
-    public string name;
-    [SerializeField] public Sprite pic;
-    public int index;
-    public int amount;
+        public itemdata data;
+        public int amount;
+        public int index;
 }

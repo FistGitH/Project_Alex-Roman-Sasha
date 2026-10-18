@@ -1,64 +1,67 @@
 using NUnit.Framework;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class inventory : MonoBehaviour
-{
-    public Image slot1; 
-    public Image slot2; 
-    public Image slot3; 
-    public Image slot4; 
-    public Image slot5; 
-    public Image slot6; 
+{ 
     public int invsize = 6;
     public item[] inv;
-    private Image[] slotpics;
+    public List<Image> slotpics;
+    public List<TextMeshProUGUI> amounts;
     public int curfreeinx = 0;
 
     private void Awake()
     {
         inv = new item[invsize];
-        slotpics = new Image[invsize];
-        slotpics[0] = slot1;
-        slotpics[1] = slot2;
-        slotpics[2] = slot3;
-        slotpics[3] = slot4;
-        slotpics[4] = slot5;
-        slotpics[5] = slot6;
     }
     public void it_add(item i)
     {
         findfreeindex();
         if (checkfreeindex())
         {
-            inv[curfreeinx] = i;
-            i.index = curfreeinx;
-            showumages();
+            int a = ininv(i);
+            if (a != -1)
+            {
+                inv[a].amount += i.amount;
+                showamounts();
+            }
+            else
+            {
+                inv[curfreeinx] = i;
+                i.index = curfreeinx;
+                showumages();
+            }
+                    
         }
     }
 
-    public void it_add(item i, int j)
+    public void test2()
     {
-        i.amount += j;
+        it_remove(inv[0], 1);
     }
+    public void test4()
+    {
+        it_remove(inv[0]);
+    }
+
 
     public void it_remove(item i)
     {
-            inv[i.index] = null;
+            if(i != null)
+            {
+                inv[i.index] = null;
+                showumages();
+                showamounts();
+            }
     }
-
     public void it_remove(item i, int j)
     {
-            i.amount += j;
-    }
-
-    public void it_combine(item i, item j)
-    {
-        if(i.name == j.name)
+        if (i != null)
         {
-            i.amount += j.amount;
-            inv[j.index] = null;
+            i.amount -= j;
+            showamounts();
         }
     }
 
@@ -90,15 +93,57 @@ public class inventory : MonoBehaviour
         }
     }
 
+    private int ininv(item it)
+    {
+        for(int i =0; i<inv.Length; i++)
+        {
+            if(inv[i] != null && it.data == inv[i].data)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private void showumages()
     {
         for(int i = 0; i < inv.Length; i++)
         {
             if (inv[i] != null && slotpics[i] != null)
             {
-                slotpics[i].sprite = inv[i].pic;
+                slotpics[i].sprite = inv[i].data.pic;
+            }
+            if (inv[i] == null && slotpics[i] != null)
+            {
+                slotpics[i].sprite = null;
             }
         }
     }
+
+    private void showamounts()
+    {
+        for(int i = 0;i < inv.Length; i++)
+        {
+            if(inv[i] != null && amounts[i] != null)
+            {
+                if (inv[i].amount == 1)
+                {
+                    amounts[i].text = " ";
+                }
+                else if(inv[i].amount == 0)
+                {
+                    inv[i] = null;
+                }
+                else
+                {
+                    amounts[i].text = inv[i].amount.ToString();
+                }
+            }
+            if (inv[i] == null && amounts[i] != null)
+            {
+                amounts[i].text = " ";
+            }
+        }
+    } 
 
 }
