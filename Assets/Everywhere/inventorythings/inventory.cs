@@ -10,7 +10,7 @@ public class inventory : MonoBehaviour
     public item[] inv;
     public List<Image> slotpics;
     public List<TextMeshProUGUI> amounts;
-    public int curfreeinx = 0;
+    private int curfreeinx = 0;
 
     private void Awake()
     {
@@ -36,16 +36,6 @@ public class inventory : MonoBehaviour
                     
         }
     }
-
-    public void test2()
-    {
-        it_remove(inv[0], 1);
-    }
-    public void test4()
-    {
-        it_remove(inv[0]);
-    }
-
 
     public void it_remove(item i)
     {
