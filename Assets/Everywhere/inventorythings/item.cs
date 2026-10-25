@@ -7,10 +7,9 @@ public class item : MonoBehaviour
     public inventory theinv;
     public string pltag;
 
-    [Header ("DONT TOUCH INDEX. Inventory")]
+    [Header ("Inventory")]
     public itemdata data;
     public int amount;
-    public int index;
 
     private bool iteractable = false;
 
