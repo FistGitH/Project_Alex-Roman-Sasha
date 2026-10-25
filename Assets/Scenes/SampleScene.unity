@@ -1415,6 +1415,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8be7ff6d71482c34fa45722c89582459, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::inventory
+  fuuuuuuuuuuuuuuuuuuuuuuuuuck: {fileID: 2411907206095950430, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   invsize: 6
   inv: []
   slotpics:

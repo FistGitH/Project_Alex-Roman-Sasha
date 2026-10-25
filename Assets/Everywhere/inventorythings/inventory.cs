@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class inventory : MonoBehaviour
 {
+    [SerializeField] private InputActionReference drop;
     public int invsize = 6;
     public item[] inv;
     public List<Image> slotpics;
@@ -21,7 +22,7 @@ public class inventory : MonoBehaviour
 
     private void Update()
     {
-        if ()
+        if (drop.action.IsPressed())
         {
             it_remove(inv[cci], 1);
         }
