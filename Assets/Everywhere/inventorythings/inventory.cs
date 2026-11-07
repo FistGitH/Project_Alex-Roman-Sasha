@@ -8,10 +8,13 @@ using UnityEngine.UI;
 public class inventory : MonoBehaviour
 {
     [SerializeField] private InputActionReference drop;
-    public int invsize = 6;
+    [SerializeField] private int invsize = 6;
     public item[] inv;
+    public List<InputActionReference> nums;
     public List<Image> slotpics;
     public List<TextMeshProUGUI> amounts;
+    [SerializeField] private GameObject player;
+    [SerializeField] private Vector3 dispos;
     private int curfreeinx = 0;
     private int cci = 0;
 
@@ -22,9 +25,10 @@ public class inventory : MonoBehaviour
 
     private void Update()
     {
-        if (drop.action.IsPressed())
+        chooseindex();
+        if (drop.action.IsPressed() && inv[cci] != null)
         {
-            it_remove(inv[cci], 1);
+            it_remove(inv[cci]);
         }
     }
 
@@ -37,6 +41,10 @@ public class inventory : MonoBehaviour
             if (a != -1)
             {
                 inv[a].amount += i.amount;
+                if(inv[a].gameObject != i.gameObject)
+                {
+                    Destroy(i);
+                }
                 showamounts();
             }
             else
@@ -54,6 +62,8 @@ public class inventory : MonoBehaviour
         int a = ininv(i);
         if(a != -1)
         {
+            inv[a].gameObject.SetActive(true);
+            inv[a].gameObject.transform.position = player.transform.position + dispos;
             inv[a] = null;
             showumages();
             showamounts();
@@ -65,7 +75,7 @@ public class inventory : MonoBehaviour
         if (ininv(i) != -1)
         {
             i.amount -= j;
-            if(i.amount <= 0)
+            if (i.amount <= 0)
             {
                 it_remove(i);
                 showumages();
@@ -154,5 +164,16 @@ public class inventory : MonoBehaviour
             }
         }
     } 
+
+    private void chooseindex()
+    {
+        for(int i = 0; i < nums.Count; i++)
+        {
+            if (nums[i].action.IsPressed())
+            {
+                cci = i;
+            }
+        }
+    }
 
 }

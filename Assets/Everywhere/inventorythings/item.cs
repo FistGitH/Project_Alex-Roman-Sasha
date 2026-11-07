@@ -4,14 +4,15 @@ using UnityEngine.InputSystem;
 public class item : MonoBehaviour
 {
     [SerializeField] private InputActionReference interact;
-    public inventory theinv;
+    [SerializeField] public inventory theinv;
     public string pltag;
 
     [Header ("Inventory")]
-    public itemdata data;
-    public int amount;
+    [SerializeField] public itemdata data;
+    [SerializeField] public int amount;
 
     private bool iteractable = false;
+
 
     private void Update()
     {
