@@ -1997,7 +1997,7 @@ GameObject:
   - component: {fileID: 606099552387236638}
   - component: {fileID: 7139104304756367360}
   m_Layer: 0
-  m_Name: SpaceShipCorridor_4
+  m_Name: SpaceShipRoom_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
