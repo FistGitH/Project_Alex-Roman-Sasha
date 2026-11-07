@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25eab539c7928ee488d3d9198fbd3d14, type: 3}
   m_Name: test2
   m_EditorClassIdentifier: Assembly-CSharp::itemdata
-  name: test2
+  name: test
   pic: {fileID: 21300000, guid: dcd8cfeb0a2d7f64bbc8d711472362aa, type: 3}
