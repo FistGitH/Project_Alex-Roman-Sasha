@@ -258,6 +258,7 @@ GameObject:
   m_Component:
   - component: {fileID: 116241638}
   - component: {fileID: 116241637}
+  - component: {fileID: 116241639}
   m_Layer: 0
   m_Name: Cutscene Director
   m_TagString: Untagged
@@ -265,6 +266,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &116241639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116241636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 753b51ed009c4c8fb317cf9da9b62e87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!320 &116241637
 PlayableDirector:
   m_ObjectHideFlags: 0
@@ -276,7 +289,7 @@ PlayableDirector:
   serializedVersion: 3
   m_PlayableAsset: {fileID: 11400000, guid: 35cac7b1305bcf24f8517038d4c48fa7, type: 2}
   m_InitialState: 1
-  m_WrapMode: 0
+  m_WrapMode: 2
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
   m_SceneBindings:
@@ -2629,6 +2642,7 @@ GameObject:
   - component: {fileID: 1085817143}
   - component: {fileID: 1085817142}
   - component: {fileID: 1085817141}
+  - component: {fileID: 1085817144}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -2697,6 +2711,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1085817144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1085817140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals: []
+    m_Events: []
 --- !u!1 &1114066024
 GameObject:
   m_ObjectHideFlags: 0

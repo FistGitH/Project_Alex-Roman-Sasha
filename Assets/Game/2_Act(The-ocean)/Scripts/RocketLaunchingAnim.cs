@@ -475,7 +475,7 @@ public class RocketLaunchingAnim : MonoBehaviour
             !Application.CanStreamedLevelBeLoaded(nextSceneName))
         {
             Debug.LogError(
-                "”кажи следующую сцену и добавь еЄ в список сцен сборки.",
+                "SpaceShipHorrorStart_Scene",
                 this
             );
             return;

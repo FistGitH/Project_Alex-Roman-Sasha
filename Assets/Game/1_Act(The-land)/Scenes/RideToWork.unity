@@ -67663,7 +67663,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c70cd0f9c4f08d44e8b2d623a097f52a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  move: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  move: {fileID: 8176279624203304153, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   acceleration: 40
   maxSpeed: 70
   reverseSpeed: 12
@@ -258207,8 +258207,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fe356183b806a44586b5d6a9ab3003b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  move: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  jump: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  move: {fileID: 8176279624203304153, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  jump: {fileID: 6781373234867585377, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   audioSource: {fileID: 1754951265}
   walkSounds:
   - {fileID: 8300000, guid: 804bce131bad28e41803ba4041dc686d, type: 3}
