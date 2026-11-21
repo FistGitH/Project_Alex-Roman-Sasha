@@ -3,7 +3,6 @@ using UnityEngine.InputSystem;
 
 public class item : MonoBehaviour
 {
-    [SerializeField] private InputActionReference interact;
     [SerializeField] public inventory theinv;
     public string pltag;
 
@@ -16,7 +15,7 @@ public class item : MonoBehaviour
 
     private void Update()
     {
-        if(iteractable && interact.action.IsPressed())
+        if(iteractable && Keyboard.current.eKey.isPressed)
         {
             pickup();
         }
